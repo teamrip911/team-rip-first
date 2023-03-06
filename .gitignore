@@ -1,6 +1,6 @@
 
-.idea/modules.xml
-*.iml
+.idea
+.idea/*
 .idea/vcs.xml
 docker/.DS_Store
 
@@ -13,3 +13,7 @@ docker/.DS_Store
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+.DS_Store
+.idea/dataSources.local.xml
+.idea/dataSources.local.xml
+.idea/dataSources.xml
