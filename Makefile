@@ -25,7 +25,7 @@ down:
 restart:
 	make dc_stop dc_start
 
-app_bash:
+bash:
 	${DOCKER_COMPOSE} exec -u www-data php-fpm bash
 php:
 	${DOCKER_COMPOSE} exec -u www-data php-fpm bash

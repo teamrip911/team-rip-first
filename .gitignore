@@ -1,0 +1,5 @@
+
+.idea/modules.xml
+*.iml
+.idea/vcs.xml
+docker/.DS_Store
