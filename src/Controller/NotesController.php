@@ -24,7 +24,8 @@ class NotesController extends AbstractController
     #[Route('/notes', name: 'notes_list', methods: ['GET'])]
     public function index(): Response
     {
-        $notes = $this->noteRepository->findBy(['user' => $this->getUser(), 'deleted_at' => null]);
+        $notes = $this->noteRepository->findBy(['user' => $this->getUser()]);
+
         $data = [];
 
         foreach ($notes as $note) {
@@ -46,7 +47,7 @@ class NotesController extends AbstractController
     public function item(int $id): Response
     {
         $note = $this->noteRepository->findOneBy(
-            ['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]
+            ['user' => $this->getUser(), 'id' => $id]
         );
 
         if (!($note instanceof Note)) {
@@ -104,7 +105,9 @@ class NotesController extends AbstractController
     ): Response {
         $em = $doctrine->getManager();
 
-        $note = $this->noteRepository->findOneBy(['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]);
+        $note = $this->noteRepository->findOneBy(
+            ['user' => $this->getUser(), 'id' => $id]
+        );
 
         if (!($note instanceof Note)) {
             return $this->json([
@@ -136,14 +139,10 @@ class NotesController extends AbstractController
     }
 
     #[Route('/notes/{id}', name: 'notes_delete', methods: ['DELETE'])]
-    public function delete(
-        int $id,
-        ManagerRegistry $doctrine
-    ): Response {
-        $em = $doctrine->getManager();
-
+    public function delete(int $id): Response
+    {
         $note = $this->noteRepository->findOneBy(
-            ['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]
+            ['user' => $this->getUser(), 'id' => $id]
         );
 
         if (!($note instanceof Note)) {
@@ -152,10 +151,7 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        $note->setDeletedAt(new \DateTimeImmutable('now'));
-
-        $em->persist($note);
-        $em->flush();
+        $this->noteRepository->remove($note, true);
 
         return $this->json([
             'message' => 'Заметка удалена!',
