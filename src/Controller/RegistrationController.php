@@ -21,6 +21,10 @@ class RegistrationController extends AbstractController
         $email = $decoded->email;
         $plaintextPassword = $decoded->password;
 
+        if ($em->getRepository(User::class)->findOneBy(['email' => $email])) {
+            return $this->json(['message' => 'User with that email already exist'], 422);
+        }
+
         $user = new User();
         $hashedPassword = $passwordHasher->hashPassword(
             $user,
@@ -34,7 +38,7 @@ class RegistrationController extends AbstractController
         try {
             $em->flush();
         } catch (\Throwable $e) {
-            return $this->json(['message' => $e->getMessage()]);
+            return $this->json(['message' => $e->getMessage()], 500);
         }
 
         return $this->json(['message' => 'Registered Successfully']);
