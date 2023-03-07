@@ -29,11 +29,11 @@ class Note
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'notes')]
     #[Assert\NotBlank]
-    private $category;
+    private Category $category;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'notes')]
     #[Assert\NotBlank]
-    private $user;
+    private User $user;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;

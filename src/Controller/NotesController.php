@@ -56,19 +56,15 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        if ($note) {
-            $data = [
-                'id' => $note->getId(),
-                'title' => $note->getTitle(),
-                'text' => $note->getText(),
-                'user_id' => $note->getUser()->getId(),
-                'category' => $note->getCategory()->getName(),
-            ];
+        $data = [
+            'id' => $note->getId(),
+            'title' => $note->getTitle(),
+            'text' => $note->getText(),
+            'user_id' => $note->getUser()->getId(),
+            'category' => $note->getCategory()->getName(),
+        ];
 
-            return $this->json($data);
-        }
-
-        return $this->json(['error' => 'Заметка не найдена!'], 404);
+        return $this->json($data);
     }
 
     #[Route('/notes', name: 'notes_create', methods: ['POST'])]
@@ -85,6 +81,7 @@ class NotesController extends AbstractController
         $entity = NoteFactory::create(
             $decoded->title,
             $decoded->text,
+            /* @phpstan-ignore-next-line */
             $user,
             $category
         );
@@ -115,7 +112,7 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        $decoded = json_decode($request->getContent(), 1);
+        $decoded = json_decode($request->getContent(), true);
 
         if (array_key_exists('category_id', $decoded)) {
             $category = $this->categoryRepository->find($decoded['category_id']);
