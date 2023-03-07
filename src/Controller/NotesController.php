@@ -24,7 +24,8 @@ class NotesController extends AbstractController
     #[Route('/notes', name: 'notes_list', methods: ['GET'])]
     public function index(): Response
     {
-        $notes = $this->noteRepository->findBy(['user' => $this->getUser(), 'deleted_at' => null]);
+        $notes = $this->noteRepository->findBy(['user' => $this->getUser()]);
+
         $data = [];
 
         foreach ($notes as $note) {
@@ -46,7 +47,7 @@ class NotesController extends AbstractController
     public function item(int $id): Response
     {
         $note = $this->noteRepository->findOneBy(
-            ['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]
+            ['user' => $this->getUser(), 'id' => $id]
         );
 
         if (!($note instanceof Note)) {
@@ -55,19 +56,15 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        if ($note) {
-            $data = [
-                'id' => $note->getId(),
-                'title' => $note->getTitle(),
-                'text' => $note->getText(),
-                'user_id' => $note->getUser()->getId(),
-                'category' => $note->getCategory()->getName(),
-            ];
+        $data = [
+            'id' => $note->getId(),
+            'title' => $note->getTitle(),
+            'text' => $note->getText(),
+            'user_id' => $note->getUser()->getId(),
+            'category' => $note->getCategory()->getName(),
+        ];
 
-            return $this->json($data);
-        }
-
-        return $this->json(['error' => 'Заметка не найдена!'], 404);
+        return $this->json($data);
     }
 
     #[Route('/notes', name: 'notes_create', methods: ['POST'])]
@@ -84,6 +81,7 @@ class NotesController extends AbstractController
         $entity = NoteFactory::create(
             $decoded->title,
             $decoded->text,
+            /* @phpstan-ignore-next-line */
             $user,
             $category
         );
@@ -104,7 +102,9 @@ class NotesController extends AbstractController
     ): Response {
         $em = $doctrine->getManager();
 
-        $note = $this->noteRepository->findOneBy(['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]);
+        $note = $this->noteRepository->findOneBy(
+            ['user' => $this->getUser(), 'id' => $id]
+        );
 
         if (!($note instanceof Note)) {
             return $this->json([
@@ -112,7 +112,7 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        $decoded = json_decode($request->getContent(), 1);
+        $decoded = json_decode($request->getContent(), true);
 
         if (array_key_exists('category_id', $decoded)) {
             $category = $this->categoryRepository->find($decoded['category_id']);
@@ -136,14 +136,10 @@ class NotesController extends AbstractController
     }
 
     #[Route('/notes/{id}', name: 'notes_delete', methods: ['DELETE'])]
-    public function delete(
-        int $id,
-        ManagerRegistry $doctrine
-    ): Response {
-        $em = $doctrine->getManager();
-
+    public function delete(int $id): Response
+    {
         $note = $this->noteRepository->findOneBy(
-            ['user' => $this->getUser(), 'id' => $id, 'deleted_at' => null]
+            ['user' => $this->getUser(), 'id' => $id]
         );
 
         if (!($note instanceof Note)) {
@@ -152,10 +148,7 @@ class NotesController extends AbstractController
             ], 404);
         }
 
-        $note->setDeletedAt(new \DateTimeImmutable('now'));
-
-        $em->persist($note);
-        $em->flush();
+        $this->noteRepository->remove($note, true);
 
         return $this->json([
             'message' => 'Заметка удалена!',
