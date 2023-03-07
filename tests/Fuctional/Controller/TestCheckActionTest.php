@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TestCheckActionTest extends WebTestCase
 {
-    public function testRequestSuccess()
+    public function testRequestSuccess(): void
     {
         $client = static::createClient();
         $client->request(Request::METHOD_GET, '/test-check');
