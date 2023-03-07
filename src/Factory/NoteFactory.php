@@ -19,6 +19,7 @@ class NoteFactory
         $note->setText($text);
         $note->setUser($user);
         $note->setCategory($category);
+
         return $note;
     }
 }

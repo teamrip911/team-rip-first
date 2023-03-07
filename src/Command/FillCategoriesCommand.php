@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Entity\Category;
-use App\Entity\Note;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -19,6 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FillCategoriesCommand extends Command
 {
     private ObjectManager $em;
+
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->em = $doctrine->getManager();
@@ -41,7 +41,7 @@ class FillCategoriesCommand extends Command
             'Наблюдения',
             'Экономика',
             'Управление фермой',
-            'Полезные советы'
+            'Полезные советы',
         ];
 
         foreach ($categories as $category) {
@@ -57,7 +57,6 @@ class FillCategoriesCommand extends Command
 
             return Command::FAILURE;
         }
-
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
 

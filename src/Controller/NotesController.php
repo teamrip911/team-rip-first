@@ -7,12 +7,12 @@ use App\Factory\NoteFactory;
 use App\Repository\CategoryRepository;
 use App\Repository\NoteRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route("/api", name: "api_")]
+#[Route('/api', name: 'api_')]
 class NotesController extends AbstractController
 {
     public function __construct(
@@ -28,7 +28,7 @@ class NotesController extends AbstractController
         $data = [];
 
         foreach ($notes as $note) {
-            $data[] =  [
+            $data[] = [
                 'id' => $note->getId(),
                 'title' => $note->getTitle(),
                 'text' => $note->getText(),
@@ -56,7 +56,7 @@ class NotesController extends AbstractController
         }
 
         if ($note) {
-            $data =  [
+            $data = [
                 'id' => $note->getId(),
                 'title' => $note->getTitle(),
                 'text' => $note->getText(),
@@ -67,7 +67,7 @@ class NotesController extends AbstractController
             return $this->json($data);
         }
 
-        return $this->json(["error" => "Заметка не найдена!"], 404);
+        return $this->json(['error' => 'Заметка не найдена!'], 404);
     }
 
     #[Route('/notes', name: 'notes_create', methods: ['POST'])]
@@ -139,8 +139,7 @@ class NotesController extends AbstractController
     public function delete(
         int $id,
         ManagerRegistry $doctrine
-    ): Response
-    {
+    ): Response {
         $em = $doctrine->getManager();
 
         $note = $this->noteRepository->findOneBy(

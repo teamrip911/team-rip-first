@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
-#[ORM\Table("notes")]
+#[ORM\Table('notes')]
 #[ORM\HasLifecycleCallbacks]
 class Note
 {
@@ -136,7 +136,7 @@ class Note
     public function updatedTimestamps(): void
     {
         $this->setUpdatedAt(new \DateTimeImmutable('now'));
-        if ($this->getCreatedAt() === null) {
+        if (null === $this->getCreatedAt()) {
             $this->setCreatedAt(new \DateTimeImmutable('now'));
         }
     }
