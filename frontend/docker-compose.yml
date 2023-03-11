@@ -1,0 +1,12 @@
+version: "3.4"
+services:
+  farm_frontend:
+    container_name: farm_frontend
+    image: node:lts
+    working_dir: /var/www/html/app/
+    entrypoint: /bin/bash
+    ports:
+      - "888:888"
+    volumes:
+      - ./:/var/www/html/app
+    tty: true

@@ -23,7 +23,7 @@ down:
 	${DOCKER_COMPOSE} down -v --rmi=all --remove-orphans
 
 restart:
-	make dc_stop dc_start
+	make stop start
 
 bash:
 	${DOCKER_COMPOSE} exec -u www-data php-fpm bash
