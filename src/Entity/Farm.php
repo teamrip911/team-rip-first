@@ -48,10 +48,14 @@ class Farm
     #[ORM\OneToMany(mappedBy: 'farm', targetEntity: AnimalGroup::class)]
     private Collection $animalGroups;
 
+    #[ORM\OneToMany(mappedBy: 'farm', targetEntity: Balance::class)]
+    private Collection $balances;
+
     public function __construct()
     {
         $this->farmAnimals = new ArrayCollection();
         $this->animalGroups = new ArrayCollection();
+        $this->balances = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +211,36 @@ class Farm
             // set the owning side to null (unless already changed)
             if ($animalGroup->getFarm() === $this) {
                 $animalGroup->setFarm(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Balance>
+     */
+    public function getBalances(): Collection
+    {
+        return $this->balances;
+    }
+
+    public function addBalance(Balance $balance): self
+    {
+        if (!$this->balances->contains($balance)) {
+            $this->balances->add($balance);
+            $balance->setFarm($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBalance(Balance $balance): self
+    {
+        if ($this->balances->removeElement($balance)) {
+            // set the owning side to null (unless already changed)
+            if ($balance->getFarm() === $this) {
+                $balance->setFarm(null);
             }
         }
 

@@ -10,6 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: FarmAnimalRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[Gedmo\SoftDeleteable(fieldName: 'deleted_at', timeAware: false, hardDelete: false)]
+#[ORM\Table('farm_animals')]
 class FarmAnimal
 {
     #[ORM\Id]
