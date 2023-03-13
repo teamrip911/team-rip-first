@@ -45,12 +45,12 @@ class Balance
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'record', targetEntity: BalanceCategoryRelation::class)]
-    private Collection $balanceCategoryRelations;
+    #[ORM\ManyToMany(targetEntity: BalanceCategory::class, inversedBy: 'balances')]
+    private Collection $balance_category;
 
     public function __construct()
     {
-        $this->balanceCategoryRelations = new ArrayCollection();
+        $this->balance_category = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -154,36 +154,6 @@ class Balance
         return $this;
     }
 
-    /**
-     * @return Collection<int, BalanceCategoryRelation>
-     */
-    public function getBalanceCategoryRelations(): Collection
-    {
-        return $this->balanceCategoryRelations;
-    }
-
-    public function addBalanceCategoryRelation(BalanceCategoryRelation $balanceCategoryRelation): self
-    {
-        if (!$this->balanceCategoryRelations->contains($balanceCategoryRelation)) {
-            $this->balanceCategoryRelations->add($balanceCategoryRelation);
-            $balanceCategoryRelation->setRecord($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBalanceCategoryRelation(BalanceCategoryRelation $balanceCategoryRelation): self
-    {
-        if ($this->balanceCategoryRelations->removeElement($balanceCategoryRelation)) {
-            // set the owning side to null (unless already changed)
-            if ($balanceCategoryRelation->getRecord() === $this) {
-                $balanceCategoryRelation->setRecord(null);
-            }
-        }
-
-        return $this;
-    }
-
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function updatedTimestamps(): void
@@ -192,5 +162,29 @@ class Balance
         if (null === $this->getCreatedAt()) {
             $this->setCreatedAt(new \DateTimeImmutable('now'));
         }
+    }
+
+    /**
+     * @return Collection<int, BalanceCategory>
+     */
+    public function getBalanceCategory(): Collection
+    {
+        return $this->balance_category;
+    }
+
+    public function addBalanceCategory(BalanceCategory $balanceCategory): self
+    {
+        if (!$this->balance_category->contains($balanceCategory)) {
+            $this->balance_category->add($balanceCategory);
+        }
+
+        return $this;
+    }
+
+    public function removeBalanceCategory(BalanceCategory $balanceCategory): self
+    {
+        $this->balance_category->removeElement($balanceCategory);
+
+        return $this;
     }
 }

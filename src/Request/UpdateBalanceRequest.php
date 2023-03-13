@@ -14,4 +14,10 @@ class UpdateBalanceRequest extends BaseRequest
 
     #[Type('integer')]
     protected int $type;
+
+    /**
+     * @var array<int>
+     */
+    #[Type('array')]
+    protected array $categories;
 }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Balance;
 use App\Entity\Farm;
 use App\Factory\BalanceFactory;
+use App\Repository\BalanceCategoryRepository;
 use App\Repository\BalanceRepository;
 use App\Repository\FarmRepository;
 use App\Request\AddBalanceRequest;
@@ -34,6 +35,9 @@ class BalanceController extends AbstractController
                 'record_date' => $record->getRecordDate(),
                 'amount' => $record->getAmount(),
                 'type' => $record->getType(),
+                'categories' => $record->getBalanceCategory()->map(function ($v) {
+                    return $v->getName();
+                }),
             ];
         }
 
@@ -44,7 +48,8 @@ class BalanceController extends AbstractController
     public function addRecord(
         AddBalanceRequest $request,
         ManagerRegistry $doctrine,
-        FarmRepository $farmRepository
+        FarmRepository $farmRepository,
+        BalanceCategoryRepository $balanceCategoryRepository
     ): Response {
         $request->validate();
         $em = $doctrine->getManager();
@@ -59,13 +64,16 @@ class BalanceController extends AbstractController
             ], 404);
         }
 
+        $categories = $balanceCategoryRepository->findBy(['id' => $request->getCategories()]);
+
         $entity = BalanceFactory::create(
             new \DateTime($request->getRecordDate()),
             $request->getAmount(),
             $request->getType(),
             $farm,
             /* @phpstan-ignore-next-line */
-            $this->getUser()
+            $this->getUser(),
+            $categories
         );
 
         $em->persist($entity);
@@ -80,7 +88,8 @@ class BalanceController extends AbstractController
     public function update(
         int $id,
         UpdateBalanceRequest $request,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        BalanceCategoryRepository $balanceCategoryRepository
     ): Response {
         $request->validate();
 
@@ -102,6 +111,18 @@ class BalanceController extends AbstractController
             $recordDate = $record->getRecordDate();
         }
 
+        if ($request->get('categories')) {
+            foreach ($record->getBalanceCategory() as $category) {
+                $record->removeBalanceCategory($category);
+            }
+
+            $categories = $balanceCategoryRepository->findBy(['id' => $request->get('categories')]);
+
+            foreach ($categories as $category) {
+                $record->addBalanceCategory($category);
+            }
+        }
+
         $record->setRecordDate($recordDate);
         $record->setAmount($request->get('amount', $record->getAmount()));
         $record->setType($request->get('type', $record->getType()));
@@ -111,6 +132,30 @@ class BalanceController extends AbstractController
 
         return $this->json([
             'message' => 'Запись обновлена!',
+        ]);
+    }
+
+    #[Route('/balance/{id}', name: 'balance_delete', methods: ['DELETE'])]
+    public function delete(
+        int $id,
+        ManagerRegistry $doctrine
+    ): Response {
+        $em = $doctrine->getManager();
+
+        $record = $this->balanceRepository->findOneBy(
+            ['id' => $id]
+        );
+
+        if (!($record instanceof Balance)) {
+            return $this->json([
+                'message' => 'Запись не найдена!',
+            ], 404);
+        }
+
+        $this->balanceRepository->remove($record, true);
+
+        return $this->json([
+            'message' => 'Запись удалена!',
         ]);
     }
 }

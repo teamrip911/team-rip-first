@@ -19,12 +19,12 @@ class BalanceCategory
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: BalanceCategoryRelation::class)]
-    private Collection $balanceCategoryRelations;
+    #[ORM\ManyToMany(targetEntity: Balance::class, mappedBy: 'balance_category')]
+    private Collection $balances;
 
     public function __construct()
     {
-        $this->balanceCategoryRelations = new ArrayCollection();
+        $this->balances = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -45,30 +45,27 @@ class BalanceCategory
     }
 
     /**
-     * @return Collection<int, BalanceCategoryRelation>
+     * @return Collection<int, Balance>
      */
-    public function getBalanceCategoryRelations(): Collection
+    public function getBalances(): Collection
     {
-        return $this->balanceCategoryRelations;
+        return $this->balances;
     }
 
-    public function addBalanceCategoryRelation(BalanceCategoryRelation $balanceCategoryRelation): self
+    public function addBalance(Balance $balance): self
     {
-        if (!$this->balanceCategoryRelations->contains($balanceCategoryRelation)) {
-            $this->balanceCategoryRelations->add($balanceCategoryRelation);
-            $balanceCategoryRelation->setCategory($this);
+        if (!$this->balances->contains($balance)) {
+            $this->balances->add($balance);
+            $balance->addBalanceCategory($this);
         }
 
         return $this;
     }
 
-    public function removeBalanceCategoryRelation(BalanceCategoryRelation $balanceCategoryRelation): self
+    public function removeBalance(Balance $balance): self
     {
-        if ($this->balanceCategoryRelations->removeElement($balanceCategoryRelation)) {
-            // set the owning side to null (unless already changed)
-            if ($balanceCategoryRelation->getCategory() === $this) {
-                $balanceCategoryRelation->setCategory(null);
-            }
+        if ($this->balances->removeElement($balance)) {
+            $balance->removeBalanceCategory($this);
         }
 
         return $this;

@@ -19,6 +19,13 @@ class AddBalanceRequest extends BaseRequest
     #[Type('integer')]
     protected int $type;
 
+    /**
+     * @var array<int>
+     */
+    #[NotBlank([])]
+    #[Type('array')]
+    protected array $categories;
+
     public function getRecordDate(): string
     {
         return $this->record_date;
@@ -32,5 +39,13 @@ class AddBalanceRequest extends BaseRequest
     public function getAmount(): int
     {
         return $this->amount;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
     }
 }
