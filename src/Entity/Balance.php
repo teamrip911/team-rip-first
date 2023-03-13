@@ -183,4 +183,14 @@ class Balance
 
         return $this;
     }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updatedTimestamps(): void
+    {
+        $this->setUpdatedAt(new \DateTimeImmutable('now'));
+        if (null === $this->getCreatedAt()) {
+            $this->setCreatedAt(new \DateTimeImmutable('now'));
+        }
+    }
 }

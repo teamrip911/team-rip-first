@@ -67,6 +67,6 @@ abstract class BaseRequest
             return $defaultValue;
         }
 
-        return $defaultValue;
+        return $this->body[$key];
     }
 }
